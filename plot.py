@@ -1,23 +1,26 @@
 import plotly.express as px
 import plotly.io as pio
+import plotly.graph_objects as go
 import pandas as pd
-from database import client, metrics, secondary_metrics
+import numpy as np
+import pymongo
+import datetime
+from pymongo import MongoClient
+from database import metrics, secondary_metrics
 
 #INTERACTIVE DISPLAY IN BROWSER
 pio.renderers.default='browser'
 
 #DISPLAY IN SPYDER
 #pio.renderers.default='svg'
-
+client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb.net/covid_data?retryWrites=true&w=majority")
 db = client["covid_data"]
-main_coll = db["main"]
-other_coll = db["other"]
+main_coll = db["main1"]
+other_coll = db["other1"]
 
 #test_FIND = main_coll.find({"areaName":"London"})
 #for test in test_FIND:  
     #print(test)
-    
-
 
 all_metrics = {
         "newCasesByPublishDate",
@@ -56,33 +59,97 @@ def metric_select():
         metric_select()
         
     return chosen_metric
-        
-    
-def test_out():
-    #this_data = get_data('areaType=region')
-    #print(this_data)  
-    
-    chosen_metric = metric_select()
+
+def get_data(chosen_metric):
     
     if chosen_metric in metrics:
         access_coll = main_coll
     elif chosen_metric in secondary_metrics:
         access_coll = other_coll
     
-    data = pd.DataFrame(list(access_coll.find({})))
-    #data['date'] = pd.to_datetime(data['date'])
+    data = pd.DataFrame(list(access_coll.find({}).sort('date', pymongo.ASCENDING)))
+    data['date'] = pd.to_datetime(data['date'])
+    
+    return data
+
+def get_y_max(data, chosen_metric):
+    
+    max_range = np.nanmax(data[chosen_metric])
+    #print(max_range)
+    
+    return max_range
+
+
+def bar_frames(data, chosen_metric):
+    
+    all_frames = []
+    start = min(data['date'])
+    end = max(data['date'])
+    
+    timestep = datetime.timedelta(days = 7)
+    i = start
+    
+    while i <= end:
+        frame_data = data[data['date'] == i]
+        all_frames.append(go.Frame(data = [go.Bar(
+                                            x = frame_data['areaName'],
+                                            y = frame_data[chosen_metric],
+                                            marker_color = 'crimson')],
+                                    layout = go.Layout(
+                                            plot_bgcolor = '#FFFFFF',
+                                            bargap = 0.15,
+                                            title = str(i))))
+        i += timestep
+        
+    return all_frames
+
+def bar_plot():
+    chosen_metric = metric_select()
     #data.sort_values('date', ascending = True, inplace = True, ignore_index = True)
     
-    test_bar = px.bar(
+    data = get_data(chosen_metric)
+    
+    get_y_max(data, chosen_metric)
+    frames0 = bar_frames(data, chosen_metric)
+    start = min(data['date'])
+    #range_max = data[chosen_metric].max()
+    
+    initial_name = data[data['date'] == start].areaName
+    initial_val = data[data['date'] == start].cumDeathsByPublishDate 
+    
+    
+    bar_out = go.Figure(data=[go.Bar(x = initial_name,
+                                     y = initial_val,
+                                     marker_color = 'crimson')],
+                        layout = go.Layout(plot_bgcolor = '#FFFFFF',
+                                           xaxis = {},
+                                           yaxis = {'range' : (0, 24000)},
+                                           bargap = 0.15,
+                                           title = str(start),
+                                           updatemenus=[dict(type="buttons",
+                                                             buttons=[dict(label="Play",
+                                                                           method="animate",
+                                                                           args=[None,{"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}]),
+                                                                      dict(label="Stop",
+                                                                           method="animate",
+                                                                           args=[[None],{"frame": {"duration": 0, "redraw": False}, "mode": "immediate","transition": {"duration": 0}}])])]),
+                        frames = list(frames0)
+                        )
+    return bar_out
+    
+    """
+    bar_out = px.bar(
                 data_frame = data, 
                 x = 'areaName', 
                 y = chosen_metric, 
                 color = 'areaName', 
                 animation_frame = 'date', 
                 animation_group = 'areaName',
-                range_y = [0, 11124000]
+                range_y = [0, 24000]
                 )
     
-    test_bar.show()
+    bar_out.show()
+    """
     
-test_out()   
+fig = bar_plot()
+fig.show()   

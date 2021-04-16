@@ -6,7 +6,7 @@ client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb
 #Database
 db = client["covid_data"]
 #Collection
-collection = db["other"]
+collection = db["other1"]
 
 #Define metric structures
 #Metrics for main - Cases/Deaths
