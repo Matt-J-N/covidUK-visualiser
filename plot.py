@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pymongo
 import datetime
+import random
 from pymongo import MongoClient
 from database import metrics, secondary_metrics
 
@@ -27,7 +28,7 @@ all_metrics = {
         "cumCasesByPublishDate",
         "newDeathsByDeathDate",
         "cumDeathsByPublishDate",
-        "cumAdmissions",
+        "hospitalCases",
         "cumPeopleVaccinatedFirstDoseByPublishDate",
         "cumPeopleVaccinatedSecondDoseByPublishDate",
         "cumPeopleVaccinatedCompleteByPublishDate",
@@ -41,7 +42,7 @@ def metric_select():
           "cumCasesByPublishDate \n"
           "newDeathsByDeathDate \n"
           "cumDeathsByPublishDate \n"
-          "cumAdmissions \n"
+          "hospitalCases \n"
           "cumPeopleVaccinatedFirstDoseByPublishDate \n"
           "cumPeopleVaccinatedSecondDoseByPublishDate \n"
           "cumPeopleVaccinatedCompleteByPublishDate \n"
@@ -79,6 +80,25 @@ def get_y_max(data, chosen_metric):
     
     return max_range
 
+def colour_mapping(area_denoms,  min, max):
+    
+    colour_map = dict()
+    
+    for area in area_denoms.unique():
+        red = random.randint(min, max)
+        green = random.randint(min, max)
+        blue = random.randint(min, max)
+        rgb = 'rgb({}, {}, {})'.format(red, green, blue)
+    
+        colour_map[area] = rgb
+        
+    return colour_map
+
+def insert_colours(data):
+    mapped_colours = colour_mapping(data.areaName, 0, 255)
+    
+    data['colour'] = data['areaName'].map(mapped_colours)
+
 
 def bar_frames(data, chosen_metric):
     
@@ -94,14 +114,14 @@ def bar_frames(data, chosen_metric):
         all_frames.append(go.Frame(data = [go.Bar(
                                             x = frame_data['areaName'],
                                             y = frame_data[chosen_metric],
-                                            marker_color = 'crimson')],
+                                            marker_color = frame_data['colour'])],
                                     layout = go.Layout(
                                             plot_bgcolor = '#FFFFFF',
                                             bargap = 0.15,
                                             title = str(i))))
         i += timestep
         
-    return all_frames
+    return all_frames 
 
 def bar_plot():
     chosen_metric = metric_select()
@@ -109,21 +129,24 @@ def bar_plot():
     
     data = get_data(chosen_metric)
     
-    get_y_max(data, chosen_metric)
+    insert_colours(data)
+    
+    y_range = get_y_max(data, chosen_metric)
     frames0 = bar_frames(data, chosen_metric)
     start = min(data['date'])
     #range_max = data[chosen_metric].max()
     
     initial_name = data[data['date'] == start].areaName
-    initial_val = data[data['date'] == start].cumDeathsByPublishDate 
+    initial_val = data[data['date'] == start].newCasesByPublishDate 
+    initial_col = data[data['date'] == start].colour
     
     
     bar_out = go.Figure(data=[go.Bar(x = initial_name,
                                      y = initial_val,
-                                     marker_color = 'crimson')],
+                                     marker_color = initial_col)],
                         layout = go.Layout(plot_bgcolor = '#FFFFFF',
                                            xaxis = {},
-                                           yaxis = {'range' : (0, 24000)},
+                                           yaxis = {'range' : (0, y_range)},
                                            bargap = 0.15,
                                            title = str(start),
                                            updatemenus=[dict(type="buttons",

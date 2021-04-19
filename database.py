@@ -18,7 +18,7 @@ metrics = {
         "cumCasesByPublishDate": "cumCasesByPublishDate",
         "newDeathsByDeathDate": "newDeathsByDeathDate",
         "cumDeathsByPublishDate": "cumDeathsByPublishDate",
-        "cumAdmissions" : "cumAdmissions"
+        
     }
 
 #Metrics for other - Vaccinations/Tests
@@ -29,19 +29,17 @@ secondary_metrics = {
         "cumPeopleVaccinatedFirstDoseByPublishDate": "cumPeopleVaccinatedFirstDoseByPublishDate",
         "cumPeopleVaccinatedSecondDoseByPublishDate": "cumPeopleVaccinatedSecondDoseByPublishDate",
         "cumPeopleVaccinatedCompleteByPublishDate": "cumPeopleVaccinatedCompleteByPublishDate",
-        "cumVirusTests": "cumVirusTests"
+        "cumVirusTests": "cumVirusTests",
+        "hospitalCases": "hospitalCases"
     }
 
 def data_loading(this_area, this_metric):
     area_type = [this_area]
-    api = Cov19API(filters=area_type, structure= this_metric)
+    api = Cov19API(filters = area_type, structure = this_metric)
     data = api.get_json()
     return data
 
-data_init = data_loading('areaType=nation', secondary_metrics)
-collection.insert_many(data_init['data'])
-
-
-
-
+if __name__ == "__main__":
+    data_init = data_loading('areaType=nation', secondary_metrics)
+    collection.insert_many(data_init['data'])
 
