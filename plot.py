@@ -161,7 +161,6 @@ def bar_plot():
     
     initial_name = data[data['date'] == start].areaName
     initial_val = get_init_val(chosen_metric, data, start)
-    #data[data['date'] == start].chosen_metric 
     initial_col = data[data['date'] == start].colour
     
     
