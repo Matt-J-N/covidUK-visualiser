@@ -14,6 +14,7 @@ pio.renderers.default='browser'
 
 #DISPLAY IN SPYDER
 #pio.renderers.default='svg'
+
 client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb.net/covid_data?retryWrites=true&w=majority")
 db = client["covid_data"]
 main_coll = db["main1"]
@@ -123,6 +124,28 @@ def bar_frames(data, chosen_metric):
         
     return all_frames 
 
+def get_init_val(chosen_metric, data, start):
+    
+    if chosen_metric == "newCasesByPublishDate":
+        init_val = data[data['date'] == start].newCasesByPublishDate
+    elif chosen_metric == "cumCasesByPublishDate":
+        init_val = data[data['date'] == start].cumCasesByPublishDate
+    elif chosen_metric == "newDeathsByDeathDate":
+        init_val = data[data['date'] == start].newDeathsByDeathDate
+    elif chosen_metric == "cumDeathsByPublishDate":
+        init_val = data[data['date'] == start].cumDeathsByPublishDate
+    elif chosen_metric == "hospitalCases":
+        init_val = data[data['date'] == start].hospitalCases
+    elif chosen_metric == "cumPeopleVaccinatedFirstDoseByPublishDate":
+        init_val = data[data['date'] == start].cumPeopleVaccinatedFirstDoseByPublishDate
+    elif chosen_metric == "cumPeopleVaccinatedSecondDoseByPublishDate":
+        init_val = data[data['date'] == start].cumPeopleVaccinatedSecondDoseByPublishDate
+    elif chosen_metric == "cumPeopleVaccinatedCompleteByPublishDate":
+        init_val = data[data['date'] == start].cumPeopleVaccinatedCompleteByPublishDate
+    elif chosen_metric == "cumVirusTests":
+        init_val = data[data['date'] == start].cumVirusTests
+    return init_val
+
 def bar_plot():
     chosen_metric = metric_select()
     #data.sort_values('date', ascending = True, inplace = True, ignore_index = True)
@@ -137,7 +160,8 @@ def bar_plot():
     #range_max = data[chosen_metric].max()
     
     initial_name = data[data['date'] == start].areaName
-    initial_val = data[data['date'] == start].newCasesByPublishDate 
+    initial_val = get_init_val(chosen_metric, data, start)
+    #data[data['date'] == start].chosen_metric 
     initial_col = data[data['date'] == start].colour
     
     
@@ -156,8 +180,8 @@ def bar_plot():
                                                                       dict(label="Stop",
                                                                            method="animate",
                                                                            args=[[None],{"frame": {"duration": 0, "redraw": False}, "mode": "immediate","transition": {"duration": 0}}])])]),
-                        frames = list(frames0)
-                        )
+                        frames = list(frames0))
+    
     return bar_out
     
     """
@@ -175,4 +199,5 @@ def bar_plot():
     """
     
 fig = bar_plot()
+fig.update_layout(barmode='stack', xaxis={'categoryorder':'total ascending'})
 fig.show()   
