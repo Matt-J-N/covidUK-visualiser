@@ -99,7 +99,49 @@ def insert_colours(data):
     mapped_colours = colour_mapping(data.areaName, 0, 255)
     
     data['colour'] = data['areaName'].map(mapped_colours)
-
+    
+def get_event(this_date):
+    
+    event_dates = ['2020-03-23', 
+                   '2020-06-01', 
+                   '2020-09-01', 
+                   '2020-11-05', 
+                   '2020-12-01', 
+                   '2020-12-08', 
+                   '2021-01-05', 
+                   '2021-04-12']
+                
+    events = {
+        '2020-03-23': 'First national lockdown',
+        '2020-06-01': 'First lockdown eases',
+        '2020-09-01': 'Schools return',
+        '2020-11-05': 'Second national lockdown',
+        '2020-12-01': 'Second lockdown eases',
+        '2020-12-08': 'Vaccination program begins',
+        '2021-01-05': 'Third national lockdown',
+        '2021-04-12': 'Third lockdown eases'
+        }
+    
+    if pd.to_datetime(this_date) >= pd.to_datetime(event_dates[7]):
+        return events[event_dates[7]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[6]):
+        return events[event_dates[6]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[5]):
+        return events[event_dates[5]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[4]):
+        return events[event_dates[4]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[3]):
+        return events[event_dates[3]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[2]):
+        return events[event_dates[2]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[1]):
+        return events[event_dates[1]]
+    elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[0]):
+        return events[event_dates[0]]
+    else: 
+        return ' '
+        
+        
 
 def bar_frames(data, chosen_metric):
     
@@ -107,10 +149,12 @@ def bar_frames(data, chosen_metric):
     start = min(data['date'])
     end = max(data['date'])
     
-    timestep = datetime.timedelta(days = 7)
+    timestep = datetime.timedelta(days = 5)
     i = start
+   
     
-    while i <= end:
+    while i <= end: 
+        this_event = get_event(i)
         frame_data = data[data['date'] == i]
         all_frames.append(go.Frame(data = [go.Bar(
                                             x = frame_data['areaName'],
@@ -119,7 +163,8 @@ def bar_frames(data, chosen_metric):
                                     layout = go.Layout(
                                             plot_bgcolor = '#FFFFFF',
                                             bargap = 0.15,
-                                            title = str(i))))
+                                            title = this_event + str(i))))
+        
         i += timestep
         
     return all_frames 
@@ -157,6 +202,7 @@ def bar_plot():
     y_range = get_y_max(data, chosen_metric)
     frames0 = bar_frames(data, chosen_metric)
     start = min(data['date'])
+    this_event = get_event(start)
     #range_max = data[chosen_metric].max()
     
     initial_name = data[data['date'] == start].areaName
@@ -171,7 +217,7 @@ def bar_plot():
                                            xaxis = {},
                                            yaxis = {'range' : (0, y_range)},
                                            bargap = 0.15,
-                                           title = str(start),
+                                           title = this_event + str(start),
                                            updatemenus=[dict(type="buttons",
                                                              buttons=[dict(label="Play",
                                                                            method="animate",
