@@ -6,7 +6,7 @@ client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb
 #Database
 db = client["covid_data"]
 #Collection
-collection = db["other1"]
+collection = db["main"]
 
 #Define metric structures
 #Metrics for main - Cases/Deaths
@@ -15,9 +15,9 @@ metrics = {
         "areaName": "areaName",
         "areaCode": "areaCode",
         "newCasesByPublishDate": "newCasesByPublishDate",
-        "cumCasesByPublishDate": "cumCasesByPublishDate",
+        "cumCasesBySpecimenDate": "cumCasesBySpecimenDate",
         "newDeathsByDeathDate": "newDeathsByDeathDate",
-        "cumDeathsByPublishDate": "cumDeathsByPublishDate",
+        "cumDeathsByPublishDate": "cumDeathsByPublishDate"
         
     }
 
@@ -29,8 +29,8 @@ secondary_metrics = {
         "cumPeopleVaccinatedFirstDoseByPublishDate": "cumPeopleVaccinatedFirstDoseByPublishDate",
         "cumPeopleVaccinatedSecondDoseByPublishDate": "cumPeopleVaccinatedSecondDoseByPublishDate",
         "cumPeopleVaccinatedCompleteByPublishDate": "cumPeopleVaccinatedCompleteByPublishDate",
-        "cumVirusTests": "cumVirusTests",
-        "hospitalCases": "hospitalCases"
+        "cumVirusTests": "cumVirusTests"
+        #"hospitalCases": "hospitalCases"
     }
 
 def data_loading(this_area, this_metric):
@@ -40,6 +40,6 @@ def data_loading(this_area, this_metric):
     return data
 
 if __name__ == "__main__":
-    data_init = data_loading('areaType=nation', secondary_metrics)
+    data_init = data_loading('areaType=region', metrics)
     collection.insert_many(data_init['data'])
 

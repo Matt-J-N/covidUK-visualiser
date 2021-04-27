@@ -15,7 +15,7 @@ def bar_frames(data, chosen_metric):
     start = min(data['date'])
     end = max(data['date'])
     
-    timestep = datetime.timedelta(days = 5)
+    timestep = datetime.timedelta(days = 1)
     i = start
    
     while i <= end: 
@@ -28,7 +28,7 @@ def bar_frames(data, chosen_metric):
                                     layout = go.Layout(
                                             plot_bgcolor = '#FFFFFF',
                                             bargap = 0.15,
-                                            title = this_event + str(i))))
+                                            title = str(i) + this_event)))
         
         i += timestep
         
@@ -60,7 +60,7 @@ def bar_plot():
                                            xaxis = {},
                                            yaxis = {'range' : (0, y_range)},
                                            bargap = 0.15,
-                                           title = this_event + str(start),
+                                           title = str(start) + this_event,
                                            updatemenus=[dict(type="buttons",
                                                              buttons=[dict(label="Play",
                                                                            method="animate",

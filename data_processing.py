@@ -7,13 +7,13 @@ from database import metrics, secondary_metrics
 
 client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb.net/covid_data?retryWrites=true&w=majority")
 db = client["covid_data"]
-main_coll = db["main1"]
-other_coll = db["other1"]
+main_coll = db["main"]
+other_coll = db["other"]
 
 
 all_metrics = {
         "newCasesByPublishDate",
-        "cumCasesByPublishDate",
+        "cumCasesBySpecimenDate",
         "newDeathsByDeathDate",
         "cumDeathsByPublishDate",
         "hospitalCases",
@@ -27,7 +27,7 @@ all_metrics = {
 def metric_select():
     print("Metrics available for visualisation: \n"
           "newCasesByPublishDate \n"
-          "cumCasesByPublishDate \n"
+          "cumCasesBySpecimenDate \n"
           "newDeathsByDeathDate \n"
           "cumDeathsByPublishDate \n"
           "hospitalCases \n"
@@ -48,6 +48,7 @@ def metric_select():
         
     return chosen_metric
 
+
 def get_data(chosen_metric):
     
     if chosen_metric in metrics:
@@ -60,11 +61,13 @@ def get_data(chosen_metric):
     
     return data
 
+
 def get_y_max(data, chosen_metric):
     
     max_range = np.nanmax(data[chosen_metric])
     
     return max_range
+
 
 def colour_mapping(area_denoms,  min, max):
     
@@ -80,14 +83,13 @@ def colour_mapping(area_denoms,  min, max):
         
     return colour_map
 
+
 def insert_colours(data):
     mapped_colours = colour_mapping(data.areaName, 0, 255)
     
     data['colour'] = data['areaName'].map(mapped_colours)
     
 def get_event(this_date): 
-    
-    i = 7
     
     event_dates = ['2020-03-23', 
                    '2020-06-01', 
@@ -99,14 +101,14 @@ def get_event(this_date):
                    '2021-04-12']
                 
     events = {
-        '2020-03-23': 'First national lockdown ',
-        '2020-06-01': 'First lockdown eases ',
-        '2020-09-01': 'Schools return ',
-        '2020-11-05': 'Second national lockdown ',
-        '2020-12-01': 'Second lockdown eases ',
-        '2020-12-08': 'Vaccination program begins ',
-        '2021-01-05': 'Third national lockdown ',
-        '2021-04-12': 'Third lockdown eases '
+        '2020-03-23': ' First national lockdown ',
+        '2020-06-01': ' First lockdown eases ',
+        '2020-09-01': ' Schools return ',
+        '2020-11-05': ' Second national lockdown ',
+        '2020-12-01': ' Second lockdown eases ',
+        '2020-12-08': ' Vaccination program begins ',
+        '2021-01-05': ' Third national lockdown ',
+        '2021-04-12': ' Third lockdown eases '
         }
     """
     while (i >= 0):
@@ -139,8 +141,8 @@ def get_init_val(chosen_metric, data, start):
     
     if chosen_metric == "newCasesByPublishDate":
         init_val = data[data['date'] == start].newCasesByPublishDate
-    elif chosen_metric == "cumCasesByPublishDate":
-        init_val = data[data['date'] == start].cumCasesByPublishDate
+    elif chosen_metric == "cumCasesBySpecimenDate":
+        init_val = data[data['date'] == start].cumCasesBySpecimenDate
     elif chosen_metric == "newDeathsByDeathDate":
         init_val = data[data['date'] == start].newDeathsByDeathDate
     elif chosen_metric == "cumDeathsByPublishDate":
