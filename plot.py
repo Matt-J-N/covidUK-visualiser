@@ -1,7 +1,7 @@
 import plotly.io as pio
 import plotly.graph_objects as go
 import datetime
-from data_processing import get_data, metric_select, get_event, insert_colours, get_y_max, get_init_val
+from data_processing import get_data, metric_select, get_event, insert_colours, get_y_max, get_init_val, all_metrics
 
 #INTERACTIVE DISPLAY IN BROWSER
 pio.renderers.default='browser'
@@ -35,8 +35,8 @@ def bar_frames(data, chosen_metric):
     return all_frames 
 
 
-def bar_plot():
-    chosen_metric = metric_select()
+def bar_plot(chosen_metric):
+    
     #data.sort_values('date', ascending = True, inplace = True, ignore_index = True)
     
     data = get_data(chosen_metric)
@@ -71,8 +71,12 @@ def bar_plot():
                         frames = list(frames0))
     
     return bar_out
+
+while True:
+    chosen_metric = metric_select()
+    if chosen_metric in all_metrics:
+        fig = bar_plot(chosen_metric)
+        fig.update_layout(barmode='stack', xaxis={'categoryorder':'total ascending'})
+        fig.show()
+        break
     
-    
-fig = bar_plot()
-fig.update_layout(barmode='stack', xaxis={'categoryorder':'total ascending'})
-fig.show()   

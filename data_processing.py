@@ -110,14 +110,7 @@ def get_event(this_date):
         '2021-01-05': ' Third national lockdown ',
         '2021-04-12': ' Third lockdown eases '
         }
-    """
-    while (i >= 0):
-        if pd.to_datetime(this_date) >= pd.to_datetime(event_dates[i]):
-            return events[event_dates[i]]
-        else:
-            return ' '
-        i = i - 1
-    """
+  
     if pd.to_datetime(this_date) >= pd.to_datetime(event_dates[7]):
         return events[event_dates[7]]
     elif pd.to_datetime(this_date) >= pd.to_datetime(event_dates[6]):
