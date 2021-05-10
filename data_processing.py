@@ -16,7 +16,6 @@ all_metrics = {
         "cumCasesBySpecimenDate",
         "newDeathsByDeathDate",
         "cumDeathsByPublishDate",
-        "hospitalCases",
         "cumPeopleVaccinatedFirstDoseByPublishDate",
         "cumPeopleVaccinatedSecondDoseByPublishDate",
         "cumPeopleVaccinatedCompleteByPublishDate",
@@ -30,7 +29,6 @@ def metric_select():
           "cumCasesBySpecimenDate \n"
           "newDeathsByDeathDate \n"
           "cumDeathsByPublishDate \n"
-          "hospitalCases \n"
           "cumPeopleVaccinatedFirstDoseByPublishDate \n"
           "cumPeopleVaccinatedSecondDoseByPublishDate \n"
           "cumPeopleVaccinatedCompleteByPublishDate \n"
@@ -140,8 +138,6 @@ def get_init_val(chosen_metric, data, start):
         init_val = data[data['date'] == start].newDeathsByDeathDate
     elif chosen_metric == "cumDeathsByPublishDate":
         init_val = data[data['date'] == start].cumDeathsByPublishDate
-    elif chosen_metric == "hospitalCases":
-        init_val = data[data['date'] == start].hospitalCases
     elif chosen_metric == "cumPeopleVaccinatedFirstDoseByPublishDate":
         init_val = data[data['date'] == start].cumPeopleVaccinatedFirstDoseByPublishDate
     elif chosen_metric == "cumPeopleVaccinatedSecondDoseByPublishDate":

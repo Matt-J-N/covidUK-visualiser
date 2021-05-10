@@ -1,7 +1,8 @@
 import plotly.io as pio
 import plotly.graph_objects as go
 import datetime
-from data_processing import get_data, metric_select, get_event, insert_colours, get_y_max, get_init_val, all_metrics
+from data_processing import (get_data, metric_select, get_event, insert_colours, 
+                             get_y_max, get_init_val, all_metrics)
 
 #INTERACTIVE DISPLAY IN BROWSER
 pio.renderers.default='browser'
@@ -15,7 +16,7 @@ def bar_frames(data, chosen_metric):
     start = min(data['date'])
     end = max(data['date'])
     
-    timestep = datetime.timedelta(days = 1)
+    timestep = datetime.timedelta(days = 3)
     i = start
    
     while i <= end: 
@@ -26,6 +27,8 @@ def bar_frames(data, chosen_metric):
                                             y = frame_data[chosen_metric],
                                             marker_color = frame_data['colour'])],
                                     layout = go.Layout(
+                                            xaxis_title = "Regions",
+                                            yaxis_title = chosen_metric,
                                             plot_bgcolor = '#FFFFFF',
                                             bargap = 0.15,
                                             title = str(i) + this_event)))
@@ -59,6 +62,8 @@ def bar_plot(chosen_metric):
                         layout = go.Layout(plot_bgcolor = '#FFFFFF',
                                            xaxis = {},
                                            yaxis = {'range' : (0, y_range)},
+                                           xaxis_title = "Regions",
+                                           yaxis_title = chosen_metric,
                                            bargap = 0.15,
                                            title = str(start) + this_event,
                                            updatemenus=[dict(type="buttons",
