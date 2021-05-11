@@ -46,6 +46,18 @@ def metric_select():
         
     return chosen_metric
 
+def get_timestep():
+    
+    timestep = input("Please enter the timestep for visualisation (in days): \n")
+    
+    try:
+        timestep = int(timestep)
+    except ValueError:
+        print("\n===========================================\n"
+              "Error - The timestep you entered is not valid\n"
+              "===========================================")
+    
+    return timestep
 
 def get_data(chosen_metric):
     

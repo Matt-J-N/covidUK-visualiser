@@ -2,7 +2,7 @@ import plotly.io as pio
 import plotly.graph_objects as go
 import datetime
 from data_processing import (get_data, metric_select, get_event, insert_colours, 
-                             get_y_max, get_init_val, all_metrics)
+                             get_y_max, get_init_val, all_metrics, get_timestep)
 
 #INTERACTIVE DISPLAY IN BROWSER
 pio.renderers.default='browser'
@@ -16,7 +16,7 @@ def bar_frames(data, chosen_metric):
     start = min(data['date'])
     end = max(data['date'])
     
-    timestep = datetime.timedelta(days = 3)
+    timestep = datetime.timedelta(days = time_step)
     i = start
    
     while i <= end: 
@@ -79,7 +79,8 @@ def bar_plot(chosen_metric):
 
 while True:
     chosen_metric = metric_select()
-    if chosen_metric in all_metrics:
+    time_step = get_timestep()
+    if (chosen_metric in all_metrics) and (type(time_step) == int):
         fig = bar_plot(chosen_metric)
         fig.update_layout(barmode='stack', xaxis={'categoryorder':'total ascending'})
         fig.show()
