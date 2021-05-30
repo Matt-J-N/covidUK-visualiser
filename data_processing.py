@@ -5,12 +5,13 @@ import random
 from pymongo import MongoClient
 from database import metrics, secondary_metrics
 
+#Re-establish database connection
 client = MongoClient("mongodb+srv://matt:fjTrmxLnqiSqKi70@cluster0.llzxg.mongodb.net/covid_data?retryWrites=true&w=majority")
 db = client["covid_data"]
-main_coll = db["main"]
-other_coll = db["other"]
+main_coll = db["main1"]
+other_coll = db["other1"]
 
-
+#List of all metrics
 all_metrics = {
         "newCasesByPublishDate",
         "cumCasesBySpecimenDate",
@@ -22,7 +23,7 @@ all_metrics = {
         "cumVirusTests"
     }
 
-
+#Prompting and validating metric input
 def metric_select():
     print("Metrics available for visualisation: \n"
           "newCasesByPublishDate \n"
@@ -46,19 +47,23 @@ def metric_select():
         
     return chosen_metric
 
+#Prompting and validation timestep input
 def get_timestep():
     
     timestep = input("Please enter the timestep for visualisation (in days): \n")
     
-    try:
-        timestep = int(timestep)
-    except ValueError:
-        print("\n===========================================\n"
-              "Error - The timestep you entered is not valid\n"
+    err_out = ("\n===========================================\n"
+              "Error - The metric you entered is not valid\n"
               "===========================================")
     
-    return timestep
+    if timestep.isdigit() == False:
+        print(err_out)
+    elif timestep == 0:
+        print(err_out)
+    else:
+        return int(timestep)
 
+#Retrieve correct data from collection based on metric
 def get_data(chosen_metric):
     
     if chosen_metric in metrics:
@@ -71,14 +76,14 @@ def get_data(chosen_metric):
     
     return data
 
-
+#Get maximum y-value of metric for y-axis scaling
 def get_y_max(data, chosen_metric):
     
     max_range = np.nanmax(data[chosen_metric])
     
     return max_range
 
-
+#Random colour generation for region
 def colour_mapping(area_denoms,  min, max):
     
     colour_map = dict()
@@ -93,12 +98,13 @@ def colour_mapping(area_denoms,  min, max):
         
     return colour_map
 
-
+#Map colours to regions in dataframe
 def insert_colours(data):
     mapped_colours = colour_mapping(data.areaName, 0, 255)
     
     data['colour'] = data['areaName'].map(mapped_colours)
     
+#Check if given date has matching event w/ event date-title dictionary    
 def get_event(this_date): 
     
     event_dates = ['2020-03-23', 
@@ -140,6 +146,8 @@ def get_event(this_date):
     else: 
         return ' '
     
+    
+#Retreieve initial values for plotting
 def get_init_val(chosen_metric, data, start):
     
     if chosen_metric == "newCasesByPublishDate":

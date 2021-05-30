@@ -7,9 +7,7 @@ from data_processing import (get_data, metric_select, get_event, insert_colours,
 #INTERACTIVE DISPLAY IN BROWSER
 pio.renderers.default='browser'
 
-#DISPLAY IN SPYDER
-#pio.renderers.default='svg'
-
+#Create individual frames for visualisation
 def bar_frames(data, chosen_metric):
     
     all_frames = []
@@ -37,10 +35,8 @@ def bar_frames(data, chosen_metric):
         
     return all_frames 
 
-
+#Combine frames to create figure (animated visualisation)
 def bar_plot(chosen_metric):
-    
-    #data.sort_values('date', ascending = True, inplace = True, ignore_index = True)
     
     data = get_data(chosen_metric)
     
@@ -77,6 +73,8 @@ def bar_plot(chosen_metric):
     
     return bar_out
 
+#Main loop - Execute visualisation and output to browser
+#Input validation constraints 
 while True:
     chosen_metric = metric_select()
     time_step = get_timestep()
